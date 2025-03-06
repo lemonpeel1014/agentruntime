@@ -1,0 +1,38 @@
+# .github/workflows/lint.yml
+name: Go Lint Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository code using the latest version of actions/checkout
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Setup the Go environment with Go version 1.23 using the latest version of actions/setup-go
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+
+      # Cache Go build files and module files to speed up builds using the latest version of actions/cache
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # Run lint to check for lint issues
+      - name: Run lint
+        run: make lint

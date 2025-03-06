@@ -1,0 +1,17 @@
+syntax = 'proto3';
+
+package agent;
+
+option go_package = "github.com/habiliai/agentruntime/runtime";
+
+service AgentRuntime {
+  rpc Run(RunRequest) returns (RunResponse);
+}
+
+message RunRequest {
+  uint32 thread_id = 1;
+  uint32 agent_id = 2;
+}
+
+message RunResponse {
+}

@@ -1,0 +1,4 @@
+.env.test
+.env
+*.pb.go
+*_grpc.pb.go
