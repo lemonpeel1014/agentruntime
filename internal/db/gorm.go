@@ -57,7 +57,7 @@ func init() {
 			return nil, err
 		}
 
-		if container.Env == di.EnvTest {
+		if container.Env == di.EnvTest || cfg.DatabaseAutoMigrate {
 			if err := DropAll(db); err != nil {
 				return nil, errors.Wrapf(err, "failed to drop database")
 			}

@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/yukinagae/genkit-go-plugins/plugins/openai"
 	"gorm.io/datatypes"
+	"gorm.io/gorm/clause"
 	"slices"
 	"strings"
 	"text/template"
@@ -55,7 +56,7 @@ func (s *service) Run(
 	}
 
 	var agent entity.Agent
-	if err := sess.First(&agent, agentId).Error; err != nil {
+	if err := sess.Preload(clause.Associations).First(&agent, agentId).Error; err != nil {
 		return errors.Wrapf(err, "failed to find agent")
 	}
 
@@ -81,7 +82,7 @@ func (s *service) Run(
 	instValues := ChatInstValues{
 		Agent:               agent,
 		RecentConversations: make([]Conversation, 0, len(messages)),
-		AvailableActions:    make([]AvailableAction, 0, len(agent.Functions)),
+		AvailableActions:    make([]AvailableAction, 0, len(agent.Tools)),
 	}
 
 	// build recent conversations
@@ -94,11 +95,13 @@ func (s *service) Run(
 	}
 
 	// build available actions
-	for _, function := range agent.Functions {
+	tools := make([]ai.Tool, 0, len(agent.Tools))
+	for _, tool := range agent.Tools {
 		instValues.AvailableActions = append(instValues.AvailableActions, AvailableAction{
-			Action:      function.Name,
-			Description: function.Description,
+			Action:      tool.Name,
+			Description: tool.Description,
 		})
+		tools = append(tools, s.toolManager.GetLocalTool(ctx, tool.LocalToolName))
 	}
 
 	var instBuilder strings.Builder
@@ -111,6 +114,7 @@ func (s *service) Run(
 	resp, err := ai.Generate(
 		ctx,
 		model,
+		ai.WithCandidates(1),
 		ai.WithSystemPrompt(agent.System),
 		ai.WithTextPrompt(instBuilder.String()),
 		ai.WithConfig(&ai.GenerationCommonConfig{
@@ -118,15 +122,20 @@ func (s *service) Run(
 			TopP:        0.5,
 			TopK:        16,
 		}),
+		// TODO: Cannot support using tools with output format
 		ai.WithOutputFormat(ai.OutputFormatJSON),
 		ai.WithOutputSchema(&Conversation{}),
+		ai.WithTools(tools...),
 	)
 	if err != nil {
 		return errors.Wrapf(err, "failed to generate")
 	}
 
+	responseText := resp.Text()
+	//responseText := mdutils.ExtractJSONFromMarkdown(responseText)
+
 	var conversation Conversation
-	if err := json.Unmarshal([]byte(resp.Text()), &conversation); err != nil {
+	if err := json.Unmarshal([]byte(responseText), &conversation); err != nil {
 		return errors.Wrapf(err, "failed to unmarshal conversation")
 	}
 

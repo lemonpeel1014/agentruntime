@@ -10,10 +10,13 @@ import (
 )
 
 type RuntimeConfig struct {
-	LogLevel     string `env:"LOG_LEVEL"`
-	LogHandler   string `env:"LOG_HANDLER"`
-	OpenAIApiKey string `env:"OPENAI_API_KEY"`
-	DatabaseUrl  string `env:"DATABASE_URL"`
+	LogLevel             string `env:"LOG_LEVEL"`
+	LogHandler           string `env:"LOG_HANDLER"`
+	OpenAIApiKey         string `env:"OPENAI_API_KEY"`
+	DatabaseUrl          string `env:"DATABASE_URL"`
+	DatabaseAutoMigrate  bool   `env:"DATABASE_AUTO_MIGRATE"`
+	LocalToolAutoMigrate bool   `env:"LOCAL_TOOL_AUTO_MIGRATE"`
+	OpenWeatherApiKey    string `env:"OPENWEATHER_API_KEY"`
 }
 
 var (
@@ -42,9 +45,11 @@ func resolveRuntimeConfig(testing bool) (*RuntimeConfig, error) {
 	configReader.AddFeeder(feeder.Env{})
 
 	c := RuntimeConfig{
-		DatabaseUrl: "postgres://postgres:postgres@localhost:5432/test?search_path=agentruntime",
-		LogLevel:    "debug",
-		LogHandler:  "default",
+		DatabaseUrl:          "postgres://postgres:postgres@localhost:5432/test?search_path=agentruntime",
+		LogLevel:             "debug",
+		LogHandler:           "default",
+		DatabaseAutoMigrate:  true,
+		LocalToolAutoMigrate: true,
 	}
 	if err := configReader.AddStruct(&c).Feed(); err != nil {
 		return nil, err

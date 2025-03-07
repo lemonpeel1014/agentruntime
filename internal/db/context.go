@@ -2,11 +2,12 @@ package db
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 var (
-	sessionCtxKey = &struct{}{}
+	sessionCtxKey = uuid.NewString()
 )
 
 func OpenSession(ctx context.Context, db *gorm.DB) (context.Context, *gorm.DB) {

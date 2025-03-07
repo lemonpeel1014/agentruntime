@@ -2,6 +2,8 @@ module github.com/habiliai/agentruntime
 
 go 1.23.6
 
+replace github.com/firebase/genkit/go => github.com/habiliai/genkit/go v0.2.2-0.20250307210207-78939b29741a
+
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/firebase/genkit/go v0.2.1

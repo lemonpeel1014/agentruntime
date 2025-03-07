@@ -21,5 +21,5 @@ type Agent struct {
 	Lore            datatypes.JSONSlice[string]
 	MessageExamples datatypes.JSONSlice[MessageExample]
 
-	Functions []Function `gorm:"many2many:agents_functions"`
+	Tools []Tool `gorm:"many2many:agents_tools"`
 }

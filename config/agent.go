@@ -16,7 +16,8 @@ type AgentConfig struct {
 		Name string `yaml:"name"`
 		Text string `yaml:"text"`
 	} `yaml:"message_examples"`
-	Model string `yaml:"model"`
+	Model string   `yaml:"model"`
+	Tools []string `yaml:"tools"`
 }
 
 func LoadAgentsFromFiles(files []string) ([]AgentConfig, error) {

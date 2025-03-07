@@ -14,7 +14,7 @@ func AutoMigrate(db *gorm.DB) error {
 	return errors.WithStack(db.AutoMigrate(
 		&entity.Agent{},
 		&entity.Message{},
-		&entity.Function{},
+		&entity.Tool{},
 		&entity.Thread{},
 	))
 }
@@ -23,8 +23,8 @@ func DropAll(db *gorm.DB) error {
 	return errors.WithStack(db.Migrator().DropTable(
 		"thread_participants",
 		&entity.Thread{},
-		"agents_functions",
-		&entity.Function{},
+		"agents_tools",
+		&entity.Tool{},
 		&entity.Message{},
 		&entity.Agent{},
 	))

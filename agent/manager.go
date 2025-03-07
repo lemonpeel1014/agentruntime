@@ -6,6 +6,7 @@ import (
 	"github.com/habiliai/agentruntime/entity"
 	myerrors "github.com/habiliai/agentruntime/errors"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/tool"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"log/slog"
@@ -18,8 +19,9 @@ type (
 		GetAgents(ctx context.Context, cursor uint, limit uint) ([]entity.Agent, error)
 	}
 	manager struct {
-		logger *slog.Logger
-		db     *gorm.DB
+		logger      *slog.Logger
+		db          *gorm.DB
+		toolManager tool.Manager
 	}
 )
 
@@ -76,6 +78,11 @@ func (s *manager) SaveAgentFromConfig(
 			Text: me.Text,
 		}
 	}
+	tools, err := s.toolManager.GetTools(ctx, ac.Tools)
+	if err != nil {
+		return agent, err
+	}
+	agent.Tools = tools
 
 	if err := tx.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(&agent).Error; err != nil {

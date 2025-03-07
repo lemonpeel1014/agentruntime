@@ -8,6 +8,9 @@ func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "agentruntime",
 		Short: "Agent runtime by HabiliAI",
+		CompletionOptions: cobra.CompletionOptions{
+			HiddenDefaultCmd: true,
+		},
 	}
 
 	cmd.AddCommand(

@@ -5,6 +5,8 @@ import (
 	"github.com/habiliai/agentruntime/config"
 	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/internal/mylog"
+	"github.com/habiliai/agentruntime/tool"
 	"github.com/pkg/errors"
 	"github.com/yukinagae/genkit-go-plugins/plugins/openai"
 	"gorm.io/gorm"
@@ -15,7 +17,9 @@ type (
 		Run(ctx context.Context, threadId uint, agentId uint) error
 	}
 	service struct {
-		db *gorm.DB
+		logger      *mylog.Logger
+		db          *gorm.DB
+		toolManager tool.Manager
 	}
 )
 
@@ -30,11 +34,6 @@ func init() {
 			return nil, err
 		}
 
-		dbInstance, err := di.Get[*gorm.DB](c, db.Key)
-		if err != nil {
-			return nil, err
-		}
-
 		if err := openai.Init(c, &openai.Config{
 			APIKey: conf.OpenAIApiKey,
 		}); err != nil {
@@ -42,7 +41,9 @@ func init() {
 		}
 
 		return &service{
-			db: dbInstance,
+			logger:      di.MustGet[*mylog.Logger](c, mylog.Key),
+			db:          di.MustGet[*gorm.DB](c, db.Key),
+			toolManager: di.MustGet[tool.Manager](c, tool.ManagerKey),
 		}, nil
 	})
 }
