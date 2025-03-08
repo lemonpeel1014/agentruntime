@@ -20,7 +20,7 @@ const (
 )
 
 var (
-	containerCtxKey = uuid.NewString()
+	containerCtxKey = uuid.New()
 )
 
 func NewKey() ObjectKey {

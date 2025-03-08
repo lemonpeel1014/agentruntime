@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	sessionCtxKey = uuid.NewString()
+	sessionCtxKey = uuid.New()
 )
 
 func OpenSession(ctx context.Context, db *gorm.DB) (context.Context, *gorm.DB) {
