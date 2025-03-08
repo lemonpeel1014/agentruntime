@@ -1,5 +1,7 @@
 # agentruntime
 
+![Test](https://github.com/habiliai/agentruntime/actions/workflows/ci.yml/badge.svg)
+
 This is under rapid development and is not ready for production use.
 
 ## Overview
