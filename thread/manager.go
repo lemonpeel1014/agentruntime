@@ -19,6 +19,7 @@ type (
 		AddMessage(ctx context.Context, threadId uint, message string) (*entity.Message, error)
 		GetMessages(ctx context.Context, threadId uint, order string, cursor uint, limit uint) ([]entity.Message, error)
 		GetThreads(ctx context.Context, cursor uint, limit uint) ([]entity.Thread, error)
+		GetThreadById(ctx context.Context, threadId uint) (*entity.Thread, error)
 	}
 
 	manager struct {
@@ -26,6 +27,17 @@ type (
 		db     *gorm.DB
 	}
 )
+
+func (s *manager) GetThreadById(ctx context.Context, threadId uint) (*entity.Thread, error) {
+	_, tx := db.OpenSession(ctx, s.db)
+
+	var thread entity.Thread
+	if err := tx.First(&thread, threadId).Error; err != nil {
+		return nil, errors.Wrapf(err, "failed to find thread")
+	}
+
+	return &thread, nil
+}
 
 func (s *manager) GetThreads(ctx context.Context, cursor uint, limit uint) ([]entity.Thread, error) {
 	_, tx := db.OpenSession(ctx, s.db)

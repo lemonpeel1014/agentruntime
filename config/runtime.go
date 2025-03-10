@@ -10,6 +10,8 @@ import (
 )
 
 type RuntimeConfig struct {
+	Host                 string `env:"HOST"`
+	Port                 int    `env:"PORT"`
 	LogLevel             string `env:"LOG_LEVEL"`
 	LogHandler           string `env:"LOG_HANDLER"`
 	OpenAIApiKey         string `env:"OPENAI_API_KEY"`
@@ -45,6 +47,8 @@ func resolveRuntimeConfig(testing bool) (*RuntimeConfig, error) {
 	configReader.AddFeeder(feeder.Env{})
 
 	c := RuntimeConfig{
+		Host:                 "0.0.0.0",
+		Port:                 8080,
 		DatabaseUrl:          "postgres://postgres:postgres@localhost:5432/test?search_path=agentruntime",
 		LogLevel:             "debug",
 		LogHandler:           "default",

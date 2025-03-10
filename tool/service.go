@@ -45,7 +45,7 @@ func (s *service) GetTools(ctx context.Context, names []string) ([]entity.Tool, 
 	_, tx := db.OpenSession(ctx, s.db)
 
 	var tools []entity.Tool
-	if err := tx.Debug().Find(&tools, "name IN ?", names).Error; err != nil {
+	if err := tx.Find(&tools, "name IN ?", names).Error; err != nil {
 		return nil, errors.Wrapf(err, "failed to find tools")
 	}
 

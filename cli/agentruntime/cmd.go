@@ -17,6 +17,7 @@ func NewCmd() *cobra.Command {
 		newRunCmd(),
 		newAgentCmd(),
 		newThreadCmd(),
+		newServeCmd(),
 	)
 
 	return cmd
