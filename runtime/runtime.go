@@ -14,7 +14,7 @@ import (
 
 type (
 	Runtime interface {
-		Run(ctx context.Context, threadId uint, agentId uint) error
+		Run(ctx context.Context, threadIds uint, agentIds []uint) error
 	}
 	service struct {
 		logger      *mylog.Logger

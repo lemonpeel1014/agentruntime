@@ -1,0 +1,23 @@
+syntax = 'proto3';
+
+package agent;
+
+option go_package = "github.com/habiliai/agentruntime/agent";
+
+service AgentManager {
+  rpc GetAgentByName(GetAgentRequest) returns (GetAgentResponse);
+}
+
+message GetAgentRequest {
+  string name = 1;
+}
+
+message GetAgentResponse {
+  Agent agent = 1;
+}
+
+message Agent {
+  uint32 id = 1;
+  string name = 2;
+  string ModelName = 3;
+}

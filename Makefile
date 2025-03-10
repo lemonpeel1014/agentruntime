@@ -51,7 +51,7 @@ $(PROTOC_GEN_GO_GRPC):
 	@export PATH="$(shell go env GOPATH)/bin:$(PATH)"
 	$(PROTOC) --go-grpc_out=. --go-grpc_opt=paths=source_relative -I. $<
 
-PB_FILES := runtime/runtime.pb.go runtime/runtime_grpc.pb.go thread/thread.pb.go thread/thread_grpc.pb.go
+PB_FILES := runtime/runtime.pb.go runtime/runtime_grpc.pb.go thread/thread.pb.go thread/thread_grpc.pb.go agent/agent.pb.go agent/agent_grpc.pb.go
 .PHONY: pb
 pb: $(PB_FILES)
 

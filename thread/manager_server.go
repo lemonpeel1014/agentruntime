@@ -12,8 +12,8 @@ type managerServer struct {
 	manager Manager
 }
 
-func (m managerServer) CreateThread(ctx context.Context, request *CreateThreadRequest) (*CreateThreadResponse, error) {
-	thr, err := m.manager.CreateThread(ctx, request.Instruction)
+func (m *managerServer) CreateThread(ctx context.Context, req *CreateThreadRequest) (*CreateThreadResponse, error) {
+	thr, err := m.manager.CreateThread(ctx, req.Instruction, req.Metadata)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (m managerServer) CreateThread(ctx context.Context, request *CreateThreadRe
 	}, nil
 }
 
-func (m managerServer) GetThread(ctx context.Context, request *GetThreadRequest) (*GetThreadResponse, error) {
+func (m *managerServer) GetThread(ctx context.Context, request *GetThreadRequest) (*GetThreadResponse, error) {
 	thr, err := m.manager.GetThreadById(ctx, uint(request.ThreadId))
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (m managerServer) GetThread(ctx context.Context, request *GetThreadRequest)
 	}, nil
 }
 
-func (m managerServer) AddMessage(ctx context.Context, request *AddMessageRequest) (*AddMessageResponse, error) {
+func (m *managerServer) AddMessage(ctx context.Context, request *AddMessageRequest) (*AddMessageResponse, error) {
 	msg, err := m.manager.AddMessage(ctx, uint(request.ThreadId), request.Message)
 	if err != nil {
 		return nil, err

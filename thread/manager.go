@@ -15,7 +15,7 @@ import (
 
 type (
 	Manager interface {
-		CreateThread(ctx context.Context, instruction string) (*entity.Thread, error)
+		CreateThread(ctx context.Context, instruction string, metadata map[string]string) (*entity.Thread, error)
 		AddMessage(ctx context.Context, threadId uint, message string) (*entity.Message, error)
 		GetMessages(ctx context.Context, threadId uint, order string, cursor uint, limit uint) ([]entity.Message, error)
 		GetThreads(ctx context.Context, cursor uint, limit uint) ([]entity.Thread, error)
@@ -109,11 +109,15 @@ func (s *manager) AddMessage(ctx context.Context, threadId uint, message string)
 	return &msg, nil
 }
 
-func (s *manager) CreateThread(ctx context.Context, instruction string) (*entity.Thread, error) {
+func (s *manager) CreateThread(ctx context.Context, instruction string, metadata map[string]string) (*entity.Thread, error) {
 	_, tx := db.OpenSession(ctx, s.db)
 
 	thread := entity.Thread{
 		Instruction: instruction,
+		Metadata:    map[string]any{},
+	}
+	for key, value := range metadata {
+		thread.Metadata[key] = value
 	}
 
 	if err := tx.Create(&thread).Error; err != nil {

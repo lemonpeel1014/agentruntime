@@ -5,13 +5,16 @@ import (
 	"github.com/habiliai/agentruntime/agent"
 	"github.com/habiliai/agentruntime/config"
 	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/db"
 	"github.com/habiliai/agentruntime/internal/mylog"
+	"github.com/habiliai/agentruntime/runtime"
 	"github.com/habiliai/agentruntime/thread"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"gorm.io/gorm"
 	"net"
 	"os"
 )
@@ -50,12 +53,21 @@ func newServeCmd() *cobra.Command {
 			cfg := di.MustGet[*config.RuntimeConfig](ctx, config.RuntimeConfigKey)
 			logger := di.MustGet[*mylog.Logger](ctx, mylog.Key)
 			threadManagerServer := di.MustGet[thread.ThreadManagerServer](ctx, thread.ManagerServerKey)
+			dbInstance := di.MustGet[*gorm.DB](ctx, db.Key)
+			agentManagerServer := di.MustGet[agent.AgentManagerServer](ctx, agent.ManagerServerKey)
+			runtimeServer := di.MustGet[runtime.AgentRuntimeServer](ctx, runtime.ServerKey)
+
+			if err := db.AutoMigrate(dbInstance); err != nil {
+				return errors.Wrapf(err, "failed to migrate database")
+			}
 
 			agentConfigs, err := config.LoadAgentsFromFiles(agentFiles)
 			for _, ac := range agentConfigs {
 				if _, err := agentManager.SaveAgentFromConfig(ctx, ac); err != nil {
 					return err
 				}
+
+				logger.Info("Agent loaded", "name", ac.Name)
 			}
 
 			lc := net.ListenConfig{}
@@ -69,6 +81,8 @@ func newServeCmd() *cobra.Command {
 			server := grpc.NewServer()
 			grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 			thread.RegisterThreadManagerServer(server, threadManagerServer)
+			agent.RegisterAgentManagerServer(server, agentManagerServer)
+			runtime.RegisterAgentRuntimeServer(server, runtimeServer)
 
 			go func() {
 				<-ctx.Done()
