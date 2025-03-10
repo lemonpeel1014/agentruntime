@@ -1,8 +1,8 @@
 package thread_test
 
 import (
-	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/entity"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mytesting"
 	"github.com/habiliai/agentruntime/thread"
 	"github.com/stretchr/testify/suite"

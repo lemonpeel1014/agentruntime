@@ -2,7 +2,7 @@ package agentruntime
 
 import (
 	"github.com/habiliai/agentruntime/agent"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/runtime"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -41,7 +41,7 @@ func newRunCmd() *cobra.Command {
 				return err
 			}
 
-			if err := runtime.Run(ctx, uint(threadId), ag.ID); err != nil {
+			if err := runtime.Run(ctx, uint(threadId), []uint{ag.ID}); err != nil {
 				return err
 			}
 

@@ -2,10 +2,10 @@ package thread
 
 import (
 	"context"
-	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/entity"
 	myerrors "github.com/habiliai/agentruntime/errors"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"github.com/pkg/errors"
 	"gorm.io/datatypes"
@@ -15,7 +15,7 @@ import (
 
 type (
 	Manager interface {
-		CreateThread(ctx context.Context, instruction string, metadata map[string]string) (*entity.Thread, error)
+		CreateThread(ctx context.Context, instruction string) (*entity.Thread, error)
 		AddMessage(ctx context.Context, threadId uint, message string) (*entity.Message, error)
 		GetMessages(ctx context.Context, threadId uint, order string, cursor uint, limit uint) ([]entity.Message, error)
 		GetThreads(ctx context.Context, cursor uint, limit uint) ([]entity.Thread, error)
@@ -109,15 +109,12 @@ func (s *manager) AddMessage(ctx context.Context, threadId uint, message string)
 	return &msg, nil
 }
 
-func (s *manager) CreateThread(ctx context.Context, instruction string, metadata map[string]string) (*entity.Thread, error) {
+func (s *manager) CreateThread(ctx context.Context, instruction string) (*entity.Thread, error) {
 	_, tx := db.OpenSession(ctx, s.db)
 
 	thread := entity.Thread{
 		Instruction: instruction,
 		Metadata:    map[string]any{},
-	}
-	for key, value := range metadata {
-		thread.Metadata[key] = value
 	}
 
 	if err := tx.Create(&thread).Error; err != nil {
@@ -133,7 +130,7 @@ var (
 )
 
 func init() {
-	di.Register(ManagerKey, func(c context.Context, _ *di.Container) (any, error) {
+	di.Register(ManagerKey, func(c context.Context, _ di.Env) (any, error) {
 		logger, err := di.Get[*mylog.Logger](c, mylog.Key)
 		if err != nil {
 			return nil, err

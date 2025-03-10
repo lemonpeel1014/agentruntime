@@ -2,8 +2,8 @@ package agent
 
 import (
 	"context"
-	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"github.com/habiliai/agentruntime/tool"
 	"gorm.io/gorm"
@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	di.Register(ManagerKey, func(c context.Context, _ *di.Container) (any, error) {
+	di.Register(ManagerKey, func(c context.Context, _ di.Env) (any, error) {
 		return &manager{
 			logger:      di.MustGet[*slog.Logger](c, mylog.Key),
 			db:          di.MustGet[*gorm.DB](c, db.Key),

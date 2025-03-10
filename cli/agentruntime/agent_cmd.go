@@ -5,7 +5,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/habiliai/agentruntime/agent"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

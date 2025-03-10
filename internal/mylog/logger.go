@@ -3,7 +3,7 @@ package mylog
 import (
 	"context"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"log/slog"
 	"os"
 )
@@ -44,7 +44,7 @@ func NewLogger(logLevel string, logHandler string) *Logger {
 }
 
 func init() {
-	di.Register(Key, func(c context.Context, _ *di.Container) (any, error) {
+	di.Register(Key, func(c context.Context, _ di.Env) (any, error) {
 		conf, err := di.Get[*config.RuntimeConfig](c, config.RuntimeConfigKey)
 		if err != nil {
 			return nil, err

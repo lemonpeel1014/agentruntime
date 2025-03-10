@@ -3,7 +3,7 @@ package runtime_test
 import (
 	"github.com/habiliai/agentruntime/agent"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mytesting"
 	"github.com/habiliai/agentruntime/runtime"
 	"github.com/habiliai/agentruntime/thread"

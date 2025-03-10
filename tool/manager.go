@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/firebase/genkit/go/ai"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/entity"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"gorm.io/gorm"
 )
@@ -26,7 +26,7 @@ var (
 )
 
 func init() {
-	di.Register(ManagerKey, func(ctx context.Context, c *di.Container) (any, error) {
+	di.Register(ManagerKey, func(ctx context.Context, env di.Env) (any, error) {
 		conf, err := di.Get[*config.RuntimeConfig](ctx, config.RuntimeConfigKey)
 		if err != nil {
 			return nil, err
@@ -38,7 +38,7 @@ func init() {
 			config: conf,
 		}
 
-		if conf.LocalToolAutoMigrate || c.Env == di.EnvTest {
+		if conf.LocalToolAutoMigrate || env == di.EnvTest {
 			if err := s.InitializeTools(ctx); err != nil {
 				return nil, err
 			}

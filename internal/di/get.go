@@ -24,7 +24,7 @@ func Get[T any](ctx context.Context, key ObjectKey) (res T, err error) {
 		return
 	}
 
-	obj, err := fn(ctx, c)
+	obj, err := fn(ctx, c.Env)
 	if err != nil {
 		return
 	}

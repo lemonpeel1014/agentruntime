@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"context"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/mokiat/gog"
 )
 
@@ -25,7 +25,7 @@ var (
 )
 
 func init() {
-	di.Register(ServerKey, func(c context.Context, _ *di.Container) (any, error) {
+	di.Register(ServerKey, func(c context.Context, _ di.Env) (any, error) {
 		return &agentRuntimeServer{
 			runtime: di.MustGet[Runtime](c, Key),
 		}, nil

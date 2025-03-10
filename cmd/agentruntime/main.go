@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/habiliai/agentruntime/cli/agentruntime"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"os"
 	"os/signal"
 	"syscall"

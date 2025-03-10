@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"github.com/pkg/errors"
 	"gorm.io/driver/postgres"
@@ -40,7 +40,7 @@ func CloseDB(db *gorm.DB) error {
 }
 
 func init() {
-	di.Register(Key, func(c context.Context, container *di.Container) (any, error) {
+	di.Register(Key, func(c context.Context, env di.Env) (any, error) {
 		logger, err := di.Get[*mylog.Logger](c, mylog.Key)
 		if err != nil {
 			return nil, err
@@ -57,7 +57,7 @@ func init() {
 			return nil, err
 		}
 
-		if container.Env == di.EnvTest || cfg.DatabaseAutoMigrate {
+		if env == di.EnvTest || cfg.DatabaseAutoMigrate {
 			if err := DropAll(db); err != nil {
 				return nil, errors.Wrapf(err, "failed to drop database")
 			}

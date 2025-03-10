@@ -2,6 +2,7 @@ package runtime_test
 
 import (
 	"github.com/habiliai/agentruntime/entity"
+	"github.com/mokiat/gog"
 )
 
 func (s *AgentRuntimeTestSuite) TestRun() {
@@ -23,7 +24,9 @@ func (s *AgentRuntimeTestSuite) TestRun() {
 	s.Require().NoError(err)
 	s.T().Logf("<< request: %v\n", messages[0].Content.Data().Text)
 
-	err = s.runtime.Run(s, thread.ID, agents[0].ID)
+	err = s.runtime.Run(s, thread.ID, gog.Map(agents, func(a entity.Agent) uint {
+		return a.ID
+	}))
 	s.Require().NoError(err)
 
 	messages, err = s.threadManager.GetMessages(s, thread.ID, "DESC", 0, 100)
@@ -37,7 +40,9 @@ func (s *AgentRuntimeTestSuite) TestRun() {
 	s.Require().NoError(err)
 	s.T().Logf("<< request: %v\n", messages[0].Content.Data().Text)
 
-	err = s.runtime.Run(s.Context, thread.ID, agents[0].ID)
+	err = s.runtime.Run(s.Context, thread.ID, gog.Map(agents, func(a entity.Agent) uint {
+		return a.ID
+	}))
 	s.Require().NoError(err)
 
 	messages, err = s.threadManager.GetMessages(s, thread.ID, "DESC", 0, 10)

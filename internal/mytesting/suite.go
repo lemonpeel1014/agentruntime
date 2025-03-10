@@ -3,8 +3,8 @@ package mytesting
 import (
 	"context"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/internal/db"
+	di "github.com/habiliai/agentruntime/internal/di"
 	"github.com/stretchr/testify/suite"
 	"gorm.io/gorm"
 )

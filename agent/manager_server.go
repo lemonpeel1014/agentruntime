@@ -2,7 +2,7 @@ package agent
 
 import (
 	"context"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 )
 
 type managerServer struct {
@@ -32,7 +32,7 @@ var (
 )
 
 func init() {
-	di.Register(ManagerServerKey, func(c context.Context, _ *di.Container) (any, error) {
+	di.Register(ManagerServerKey, func(c context.Context, _ di.Env) (any, error) {
 		return &managerServer{
 			manager: di.MustGet[Manager](c, ManagerKey),
 		}, nil

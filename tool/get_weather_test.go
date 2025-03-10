@@ -3,7 +3,7 @@ package tool_test
 import (
 	"context"
 	"fmt"
-	"github.com/habiliai/agentruntime/di"
+	di "github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/tool"
 	"github.com/stretchr/testify/require"
 	"os"

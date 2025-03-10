@@ -2,7 +2,7 @@ package thread
 
 import (
 	"context"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -13,7 +13,7 @@ type managerServer struct {
 }
 
 func (m *managerServer) CreateThread(ctx context.Context, req *CreateThreadRequest) (*CreateThreadResponse, error) {
-	thr, err := m.manager.CreateThread(ctx, req.Instruction, req.Metadata)
+	thr, err := m.manager.CreateThread(ctx, req.Instruction)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ var (
 )
 
 func init() {
-	di.Register(ManagerServerKey, func(ctx context.Context, c *di.Container) (any, error) {
+	di.Register(ManagerServerKey, func(ctx context.Context, _ di.Env) (any, error) {
 		return &managerServer{
 			manager: di.MustGet[Manager](ctx, ManagerKey),
 		}, nil

@@ -3,7 +3,7 @@ package agentruntime
 import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/thread"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"

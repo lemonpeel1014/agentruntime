@@ -3,8 +3,8 @@ package runtime
 import (
 	"context"
 	"github.com/habiliai/agentruntime/config"
-	"github.com/habiliai/agentruntime/di"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"github.com/habiliai/agentruntime/tool"
 	"github.com/pkg/errors"
@@ -28,7 +28,7 @@ var (
 )
 
 func init() {
-	di.Register(Key, func(c context.Context, _ *di.Container) (any, error) {
+	di.Register(Key, func(c context.Context, _ di.Env) (any, error) {
 		conf, err := di.Get[*config.RuntimeConfig](c, config.RuntimeConfigKey)
 		if err != nil {
 			return nil, err

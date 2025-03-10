@@ -4,7 +4,7 @@ import (
 	"context"
 	goconfig "github.com/golobby/config/v3"
 	"github.com/golobby/config/v3/pkg/feeder"
-	"github.com/habiliai/agentruntime/di"
+	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/pkg/errors"
 	"os"
 )
@@ -63,7 +63,7 @@ func resolveRuntimeConfig(testing bool) (*RuntimeConfig, error) {
 }
 
 func init() {
-	di.Register(RuntimeConfigKey, func(ctx context.Context, c *di.Container) (any, error) {
-		return resolveRuntimeConfig(c.Env == di.EnvTest)
+	di.Register(RuntimeConfigKey, func(ctx context.Context, env di.Env) (any, error) {
+		return resolveRuntimeConfig(env == di.EnvTest)
 	})
 }
