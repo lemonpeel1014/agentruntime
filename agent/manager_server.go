@@ -11,20 +11,33 @@ type managerServer struct {
 	manager Manager
 }
 
-func (m *managerServer) GetAgentByName(ctx context.Context, request *GetAgentRequest) (*GetAgentResponse, error) {
+func (m *managerServer) GetAgent(ctx context.Context, req *GetAgentRequest) (*Agent, error) {
+	agent, err := m.manager.GetAgent(ctx, uint(req.AgentId))
+	if err != nil {
+		return nil, err
+	}
+
+	return &Agent{
+		Id:        uint32(agent.ID),
+		Name:      agent.Name,
+		ModelName: agent.ModelName,
+		Busy:      agent.Busy,
+		Metadata:  agent.Metadata.Data(),
+	}, nil
+}
+
+func (m *managerServer) GetAgentByName(ctx context.Context, request *GetAgentByNameRequest) (*Agent, error) {
 	agent, err := m.manager.FindAgentByName(ctx, request.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GetAgentResponse{
-		Agent: &Agent{
-			Id:        uint32(agent.ID),
-			Name:      agent.Name,
-			ModelName: agent.ModelName,
-			Busy:      agent.Busy,
-			Metadata:  agent.Metadata.Data(),
-		},
+	return &Agent{
+		Id:        uint32(agent.ID),
+		Name:      agent.Name,
+		ModelName: agent.ModelName,
+		Busy:      agent.Busy,
+		Metadata:  agent.Metadata.Data(),
 	}, nil
 }
 

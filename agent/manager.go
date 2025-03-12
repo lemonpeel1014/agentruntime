@@ -19,6 +19,7 @@ type (
 		SaveAgentFromConfig(ctx context.Context, ac config.AgentConfig) (entity.Agent, error)
 		GetAgents(ctx context.Context, cursor uint, limit uint) ([]entity.Agent, error)
 		UpdateAgent(ctx context.Context, id uint, metadata map[string]string) error
+		GetAgent(ctx context.Context, id uint) (*entity.Agent, error)
 	}
 	manager struct {
 		logger      *slog.Logger
@@ -30,6 +31,17 @@ type (
 var (
 	_ Manager = (*manager)(nil)
 )
+
+func (s *manager) GetAgent(ctx context.Context, id uint) (*entity.Agent, error) {
+	_, tx := db.OpenSession(ctx, s.db)
+
+	var agent entity.Agent
+	if err := tx.First(&agent, id).Error; err != nil {
+		return nil, errors.Wrapf(err, "failed to find agent")
+	}
+
+	return &agent, nil
+}
 
 func (s *manager) UpdateAgent(ctx context.Context, id uint, metadata map[string]string) error {
 	_, tx := db.OpenSession(ctx, s.db)
