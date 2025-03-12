@@ -22,4 +22,6 @@ type Agent struct {
 	MessageExamples datatypes.JSONSlice[MessageExample]
 
 	Tools []Tool `gorm:"many2many:agents_tools"`
+
+	Metadata datatypes.JSONType[map[string]string]
 }

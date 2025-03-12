@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/firebase/genkit/go/ai"
 	"github.com/habiliai/agentruntime/internal/di"
 	"github.com/pkg/errors"
 	"net/http"
@@ -139,19 +138,11 @@ func (s *service) GetWeather(ctx context.Context, req *GetWeatherRequest) (*GetW
 		return nil, errors.Wrapf(err, "error occurred while fetching weather information")
 	}
 
-	// TODO: update memory about weather summary of today in context
-	//if err := ctx.UpdateMemory(map[string]any{
-	//	"weather_summary": weatherSummary,
-	//}); err != nil {
-	//	return nil, err
-	//}
-
 	return weatherSummary, nil
 }
 
 func init() {
-	localToolNames = append(localToolNames, "get_weather")
-	ai.DefineTool(
+	RegisterLocalTool(
 		"get_weather",
 		"Get weather information when you need it",
 		func(ctx context.Context, req struct {

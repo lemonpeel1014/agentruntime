@@ -8,6 +8,7 @@ import (
 	"github.com/habiliai/agentruntime/internal/db"
 	"github.com/habiliai/agentruntime/tool"
 	"github.com/pkg/errors"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"log/slog"
 )
@@ -83,6 +84,7 @@ func (s *manager) SaveAgentFromConfig(
 		return agent, err
 	}
 	agent.Tools = tools
+	agent.Metadata = datatypes.NewJSONType(ac.Metadata)
 
 	if err := tx.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(&agent).Error; err != nil {

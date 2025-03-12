@@ -18,6 +18,7 @@ type (
 		CreateThread(ctx context.Context, instruction string) (*entity.Thread, error)
 		AddMessage(ctx context.Context, threadId uint, message string) (*entity.Message, error)
 		GetMessages(ctx context.Context, threadId uint, order string, cursor uint, limit uint) ([]entity.Message, error)
+		GetNumMessages(ctx context.Context, threadId uint) (int64, error)
 		GetThreads(ctx context.Context, cursor uint, limit uint) ([]entity.Thread, error)
 		GetThreadById(ctx context.Context, threadId uint) (*entity.Thread, error)
 	}
@@ -27,6 +28,17 @@ type (
 		db     *gorm.DB
 	}
 )
+
+func (s *manager) GetNumMessages(ctx context.Context, threadId uint) (int64, error) {
+	_, tx := db.OpenSession(ctx, s.db)
+
+	var count int64
+	if err := tx.Model(&entity.Message{}).Where("thread_id = ?", threadId).Count(&count).Error; err != nil {
+		return 0, errors.Wrapf(err, "failed to count messages")
+	}
+
+	return count, nil
+}
 
 func (s *manager) GetThreadById(ctx context.Context, threadId uint) (*entity.Thread, error) {
 	_, tx := db.OpenSession(ctx, s.db)
@@ -114,7 +126,6 @@ func (s *manager) CreateThread(ctx context.Context, instruction string) (*entity
 
 	thread := entity.Thread{
 		Instruction: instruction,
-		Metadata:    map[string]any{},
 	}
 
 	if err := tx.Create(&thread).Error; err != nil {

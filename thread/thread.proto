@@ -11,6 +11,38 @@ service ThreadManager {
   rpc GetThread(GetThreadRequest) returns (GetThreadResponse);
 
   rpc AddMessage(AddMessageRequest) returns (AddMessageResponse);
+  rpc GetMessages(GetMessagesRequest) returns (stream GetMessagesResponse);
+  rpc GetNumMessages(GetNumMessagesRequest) returns (GetNumMessagesResponse);
+}
+
+message GetNumMessagesRequest {
+  uint32 thread_id = 1;
+}
+
+message GetNumMessagesResponse {
+  uint32 num_messages = 2;
+}
+
+message GetMessagesRequest {
+  enum Order {
+    OLDEST = 0;
+    LATEST = 1;
+  }
+  uint32 thread_id = 1;
+  Order order = 2;
+  uint32 limit = 3;
+}
+
+message GetMessagesResponse {
+  repeated Message messages = 1;
+}
+
+message Message {
+  uint32 id = 1;
+  string content = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  string sender = 5;
 }
 
 message AddMessageRequest {
