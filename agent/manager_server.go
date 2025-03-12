@@ -22,8 +22,18 @@ func (m *managerServer) GetAgentByName(ctx context.Context, request *GetAgentReq
 			Id:        uint32(agent.ID),
 			Name:      agent.Name,
 			ModelName: agent.ModelName,
+			Busy:      agent.Busy,
+			Metadata:  agent.Metadata.Data(),
 		},
 	}, nil
+}
+
+func (m *managerServer) UpdateAgent(ctx context.Context, req *UpdateAgentRequest) (*UpdateAgentResponse, error) {
+	if err := m.manager.UpdateAgent(ctx, uint(req.AgentId), req.Metadata); err != nil {
+		return nil, err
+	}
+
+	return &UpdateAgentResponse{}, nil
 }
 
 var (

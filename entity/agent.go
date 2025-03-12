@@ -24,4 +24,5 @@ type Agent struct {
 	Tools []Tool `gorm:"many2many:agents_tools"`
 
 	Metadata datatypes.JSONType[map[string]string]
+	Busy     bool
 }
