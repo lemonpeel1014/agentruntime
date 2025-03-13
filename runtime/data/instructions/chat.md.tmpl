@@ -1,3 +1,15 @@
+{{- if .Thread }}
+# About this thread
+{{ .Thread.Instruction }}
+
+## Participants
+{{- range .Thread.Participants }}
+- {{ .Name }}:
+  - Name: {{ .Name }}
+  - Role: {{ .Role }}
+{{- end }}
+{{- end }}
+
 {{- if .Knowledge }}
 # Knowledge
 {{- range .Knowledge }}

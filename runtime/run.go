@@ -42,6 +42,7 @@ type (
 		Knowledge           []string
 		AvailableActions    []AvailableAction
 		MessageExamples     [][]entity.MessageExample
+		Thread              *entity.Thread
 	}
 )
 
@@ -92,6 +93,7 @@ func (s *service) Run(
 				MessageExamples:     agent.MessageExamples,
 				RecentConversations: make([]Conversation, 0, len(messages)),
 				AvailableActions:    make([]AvailableAction, 0, len(agent.Tools)),
+				Thread:              &thread,
 			}
 
 			// build recent conversations
@@ -113,11 +115,11 @@ func (s *service) Run(
 				tools = append(tools, s.toolManager.GetLocalTool(ctx, tool.LocalToolName))
 			}
 
-			var promptBuilder strings.Builder
-			if err := chatInstTmpl.Execute(&promptBuilder, instValues); err != nil {
+			var promptBuf strings.Builder
+			if err := chatInstTmpl.Execute(&promptBuf, instValues); err != nil {
 				return errors.Wrapf(err, "failed to execute template")
 			}
-			prompt := promptBuilder.String()
+			prompt := promptBuf.String()
 
 			s.logger.Debug("call agent runtime's run", "prompt", prompt)
 
