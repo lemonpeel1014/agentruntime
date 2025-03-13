@@ -6,7 +6,6 @@ option go_package = "github.com/habiliai/agentruntime/agent";
 
 service AgentManager {
   rpc GetAgentByName(GetAgentByNameRequest) returns (Agent);
-  rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse);
   rpc GetAgent(GetAgentRequest) returns (Agent);
 }
 

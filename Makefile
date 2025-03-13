@@ -66,7 +66,7 @@ lint: $(GOLANG_CI_LINT) pb
 
 .PHONY: test
 test: pb
-	CI=true go test -timeout 15m -p 1 ./...
+	ENV_TEST_FILE=$(shell pwd)/.env.test CI=true go test -timeout 15m -p 1 ./...
 
 .PHONY: clean
 clean:

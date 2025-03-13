@@ -7,14 +7,18 @@ replace github.com/firebase/genkit/go => github.com/habiliai/genkit/go v0.2.2-0.
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/firebase/genkit/go v0.2.1
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gdamore/tcell/v2 v2.8.1
+	github.com/goccy/go-yaml v1.15.23
 	github.com/golobby/config/v3 v3.4.2
 	github.com/google/uuid v1.6.0
 	github.com/lmittmann/tint v1.0.7
+	github.com/mokiat/gog v0.15.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.9.0
 	github.com/yukinagae/genkit-go-plugins v0.2.1
+	golang.org/x/sync v0.12.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2
 	gorm.io/datatypes v1.2.5
@@ -53,7 +57,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/mokiat/gog v0.15.0 // indirect
 	github.com/openai/openai-go v0.1.0-alpha.13 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
@@ -75,7 +78,6 @@ require (
 	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81 // indirect
 	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect

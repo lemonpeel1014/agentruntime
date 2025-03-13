@@ -1,9 +1,9 @@
 package config
 
 import (
+	"github.com/goccy/go-yaml"
 	"github.com/pkg/errors"
 	"os"
-	"sigs.k8s.io/yaml"
 )
 
 type AgentConfig struct {
@@ -13,9 +13,11 @@ type AgentConfig struct {
 	Bio             []string `yaml:"bio"`
 	Lore            []string `yaml:"lore"`
 	MessageExamples []struct {
-		Name string `yaml:"name"`
-		Text string `yaml:"text"`
-	} `yaml:"message_examples"`
+		Messages []struct {
+			Name string `yaml:"name"`
+			Text string `yaml:"text"`
+		} `yaml:"messages"`
+	} `yaml:"messageExamples"`
 	Model    string            `yaml:"model"`
 	Tools    []string          `yaml:"tools"`
 	Metadata map[string]string `yaml:"metadata"`

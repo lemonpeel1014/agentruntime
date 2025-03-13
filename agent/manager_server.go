@@ -41,14 +41,6 @@ func (m *managerServer) GetAgentByName(ctx context.Context, request *GetAgentByN
 	}, nil
 }
 
-func (m *managerServer) UpdateAgent(ctx context.Context, req *UpdateAgentRequest) (*UpdateAgentResponse, error) {
-	if err := m.manager.UpdateAgent(ctx, uint(req.AgentId), req.Metadata); err != nil {
-		return nil, err
-	}
-
-	return &UpdateAgentResponse{}, nil
-}
-
 var (
 	_                AgentManagerServer = (*managerServer)(nil)
 	ManagerServerKey                    = di.NewKey()

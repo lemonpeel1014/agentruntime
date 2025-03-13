@@ -18,7 +18,6 @@ type (
 		FindAgentByName(ctx context.Context, name string) (*entity.Agent, error)
 		SaveAgentFromConfig(ctx context.Context, ac config.AgentConfig) (entity.Agent, error)
 		GetAgents(ctx context.Context, cursor uint, limit uint) ([]entity.Agent, error)
-		UpdateAgent(ctx context.Context, id uint, metadata map[string]string) error
 		GetAgent(ctx context.Context, id uint) (*entity.Agent, error)
 	}
 	manager struct {
@@ -43,23 +42,6 @@ func (s *manager) GetAgent(ctx context.Context, id uint) (*entity.Agent, error) 
 	return &agent, nil
 }
 
-func (s *manager) UpdateAgent(ctx context.Context, id uint, metadata map[string]string) error {
-	_, tx := db.OpenSession(ctx, s.db)
-
-	var agent entity.Agent
-	if err := tx.First(&agent, id).Error; err != nil {
-		return errors.Wrapf(err, "failed to find agent")
-	}
-
-	agent.Metadata = datatypes.NewJSONType(metadata)
-
-	if err := tx.Save(&agent).Error; err != nil {
-		return errors.Wrapf(err, "failed to save agent")
-	}
-
-	return nil
-}
-
 func (s *manager) GetAgents(ctx context.Context, cursor uint, limit uint) ([]entity.Agent, error) {
 	_, tx := db.OpenSession(ctx, s.db)
 
@@ -75,7 +57,7 @@ func (s *manager) FindAgentByName(ctx context.Context, name string) (*entity.Age
 	_, tx := db.OpenSession(ctx, s.db)
 
 	var agent entity.Agent
-	if r := tx.Find(&agent, "name = ?", name); r.Error != nil {
+	if r := tx.Find(&agent, "name ILIKE ?", name); r.Error != nil {
 		return nil, errors.Wrapf(r.Error, "failed to find agent")
 	} else if r.RowsAffected == 0 {
 		return nil, errors.Wrapf(myerrors.ErrNotFound, "failed to find agent")
@@ -98,16 +80,20 @@ func (s *manager) SaveAgentFromConfig(
 	agent.Bio = ac.Bio
 	agent.Role = ac.Role
 	agent.Lore = ac.Lore
-	agent.MessageExamples = make([]entity.MessageExample, len(ac.MessageExamples))
+	agent.MessageExamples = make([][]entity.MessageExample, 0, len(ac.MessageExamples))
 	agent.ModelName = ac.Model
 	if agent.ModelName == "" {
 		agent.ModelName = "gpt-4o"
 	}
-	for i, me := range ac.MessageExamples {
-		agent.MessageExamples[i] = entity.MessageExample{
-			User: me.Name,
-			Text: me.Text,
+	for _, ex := range ac.MessageExamples {
+		var messages []entity.MessageExample
+		for _, msg := range ex.Messages {
+			messages = append(messages, entity.MessageExample{
+				User: msg.Name,
+				Text: msg.Text,
+			})
 		}
+		agent.MessageExamples = append(agent.MessageExamples, messages)
 	}
 	tools, err := s.toolManager.GetTools(ctx, ac.Tools)
 	if err != nil {

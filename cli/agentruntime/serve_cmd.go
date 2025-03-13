@@ -2,10 +2,12 @@ package agentruntime
 
 import (
 	"fmt"
+	"github.com/fsnotify/fsnotify"
 	"github.com/habiliai/agentruntime/agent"
 	"github.com/habiliai/agentruntime/config"
 	"github.com/habiliai/agentruntime/internal/db"
 	di "github.com/habiliai/agentruntime/internal/di"
+	interceptors "github.com/habiliai/agentruntime/internal/grpc-interceptors"
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"github.com/habiliai/agentruntime/runtime"
 	"github.com/habiliai/agentruntime/thread"
@@ -20,6 +22,9 @@ import (
 )
 
 func newServeCmd() *cobra.Command {
+	flags := &struct {
+		watch bool
+	}{}
 	cmd := &cobra.Command{
 		Use:   "serve <agent-file OR agent-files-dir>",
 		Short: "Start agent runtime server",
@@ -49,6 +54,7 @@ func newServeCmd() *cobra.Command {
 			ctx := cmd.Context()
 			ctx = di.WithContainer(ctx, di.EnvProd)
 
+			// Initialize the container
 			agentManager := di.MustGet[agent.Manager](ctx, agent.ManagerKey)
 			cfg := di.MustGet[*config.RuntimeConfig](ctx, config.RuntimeConfigKey)
 			logger := di.MustGet[*mylog.Logger](ctx, mylog.Key)
@@ -57,11 +63,18 @@ func newServeCmd() *cobra.Command {
 			agentManagerServer := di.MustGet[agent.AgentManagerServer](ctx, agent.ManagerServerKey)
 			runtimeServer := di.MustGet[runtime.AgentRuntimeServer](ctx, runtime.ServerKey)
 
+			logger.Debug("start agent-runtime", "config", cfg)
+
+			// auto migrate the database
 			if err := db.AutoMigrate(dbInstance); err != nil {
 				return errors.Wrapf(err, "failed to migrate database")
 			}
 
+			// load agent config files
 			agentConfigs, err := config.LoadAgentsFromFiles(agentFiles)
+			if err != nil {
+				return errors.Wrapf(err, "failed to load agent config")
+			}
 			for _, ac := range agentConfigs {
 				if _, err := agentManager.SaveAgentFromConfig(ctx, ac); err != nil {
 					return err
@@ -70,6 +83,60 @@ func newServeCmd() *cobra.Command {
 				logger.Info("Agent loaded", "name", ac.Name)
 			}
 
+			// register agent file watcher
+			var watcher *fsnotify.Watcher
+			if flags.watch {
+				watcher, err = fsnotify.NewWatcher()
+				if err != nil {
+					return errors.Wrapf(err, "failed to create watcher")
+				}
+
+				for _, file := range agentFiles {
+					if err := watcher.Add(file); err != nil {
+						return errors.Wrapf(err, "failed to watch file %s", file)
+					}
+				}
+
+				go func() {
+					for {
+						select {
+						case <-ctx.Done():
+							return
+						case event, ok := <-watcher.Events:
+							if !ok {
+								return
+							}
+							if event.Op&fsnotify.Write == fsnotify.Write {
+								agentConfigs, err := config.LoadAgentsFromFiles(agentFiles)
+								if err != nil {
+									logger.Error("Failed to load agent config", "error", err)
+									continue
+								}
+								for _, ac := range agentConfigs {
+									if _, err := agentManager.SaveAgentFromConfig(ctx, ac); err != nil {
+										logger.Error("Failed to save agent config", "error", err)
+										continue
+									}
+
+									logger.Info("Agent Reloaded", "name", ac.Name)
+								}
+							}
+						case err, ok := <-watcher.Errors:
+							if !ok {
+								return
+							}
+							logger.Error("Watcher error", "error", err)
+						}
+					}
+				}()
+			}
+			defer func() {
+				if watcher != nil {
+					watcher.Close()
+				}
+			}()
+
+			// prepare to listen the grpc server
 			lc := net.ListenConfig{}
 			listener, err := lc.Listen(ctx, "tcp", fmt.Sprintf("%s:%d", cfg.Host, cfg.Port))
 			if err != nil {
@@ -78,7 +145,9 @@ func newServeCmd() *cobra.Command {
 
 			logger.Info("Starting server", "host", cfg.Host, "port", cfg.Port)
 
-			server := grpc.NewServer()
+			server := grpc.NewServer(
+				grpc.UnaryInterceptor(interceptors.NewUnaryServerInterceptor(ctx)),
+			)
 			grpc_health_v1.RegisterHealthServer(server, health.NewServer())
 			thread.RegisterThreadManagerServer(server, threadManagerServer)
 			agent.RegisterAgentManagerServer(server, agentManagerServer)
@@ -89,6 +158,7 @@ func newServeCmd() *cobra.Command {
 				server.GracefulStop()
 			}()
 
+			// start the grpc server
 			return server.Serve(listener)
 		},
 	}

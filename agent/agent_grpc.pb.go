@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion8
 
 const (
 	AgentManager_GetAgentByName_FullMethodName = "/agent.AgentManager/GetAgentByName"
-	AgentManager_UpdateAgent_FullMethodName    = "/agent.AgentManager/UpdateAgent"
 	AgentManager_GetAgent_FullMethodName       = "/agent.AgentManager/GetAgent"
 )
 
@@ -29,7 +28,6 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentManagerClient interface {
 	GetAgentByName(ctx context.Context, in *GetAgentByNameRequest, opts ...grpc.CallOption) (*Agent, error)
-	UpdateAgent(ctx context.Context, in *UpdateAgentRequest, opts ...grpc.CallOption) (*UpdateAgentResponse, error)
 	GetAgent(ctx context.Context, in *GetAgentRequest, opts ...grpc.CallOption) (*Agent, error)
 }
 
@@ -51,16 +49,6 @@ func (c *agentManagerClient) GetAgentByName(ctx context.Context, in *GetAgentByN
 	return out, nil
 }
 
-func (c *agentManagerClient) UpdateAgent(ctx context.Context, in *UpdateAgentRequest, opts ...grpc.CallOption) (*UpdateAgentResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateAgentResponse)
-	err := c.cc.Invoke(ctx, AgentManager_UpdateAgent_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *agentManagerClient) GetAgent(ctx context.Context, in *GetAgentRequest, opts ...grpc.CallOption) (*Agent, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Agent)
@@ -76,7 +64,6 @@ func (c *agentManagerClient) GetAgent(ctx context.Context, in *GetAgentRequest, 
 // for forward compatibility
 type AgentManagerServer interface {
 	GetAgentByName(context.Context, *GetAgentByNameRequest) (*Agent, error)
-	UpdateAgent(context.Context, *UpdateAgentRequest) (*UpdateAgentResponse, error)
 	GetAgent(context.Context, *GetAgentRequest) (*Agent, error)
 	mustEmbedUnimplementedAgentManagerServer()
 }
@@ -87,9 +74,6 @@ type UnimplementedAgentManagerServer struct {
 
 func (UnimplementedAgentManagerServer) GetAgentByName(context.Context, *GetAgentByNameRequest) (*Agent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAgentByName not implemented")
-}
-func (UnimplementedAgentManagerServer) UpdateAgent(context.Context, *UpdateAgentRequest) (*UpdateAgentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAgent not implemented")
 }
 func (UnimplementedAgentManagerServer) GetAgent(context.Context, *GetAgentRequest) (*Agent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAgent not implemented")
@@ -125,24 +109,6 @@ func _AgentManager_GetAgentByName_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AgentManager_UpdateAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateAgentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AgentManagerServer).UpdateAgent(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AgentManager_UpdateAgent_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentManagerServer).UpdateAgent(ctx, req.(*UpdateAgentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AgentManager_GetAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAgentRequest)
 	if err := dec(in); err != nil {
@@ -171,10 +137,6 @@ var AgentManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAgentByName",
 			Handler:    _AgentManager_GetAgentByName_Handler,
-		},
-		{
-			MethodName: "UpdateAgent",
-			Handler:    _AgentManager_UpdateAgent_Handler,
 		},
 		{
 			MethodName: "GetAgent",

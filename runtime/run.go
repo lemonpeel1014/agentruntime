@@ -41,6 +41,7 @@ type (
 		RecentConversations []Conversation
 		Knowledge           []string
 		AvailableActions    []AvailableAction
+		MessageExamples     [][]entity.MessageExample
 	}
 )
 
@@ -88,6 +89,7 @@ func (s *service) Run(
 			// construct inst values
 			instValues := ChatInstValues{
 				Agent:               agent,
+				MessageExamples:     agent.MessageExamples,
 				RecentConversations: make([]Conversation, 0, len(messages)),
 				AvailableActions:    make([]AvailableAction, 0, len(agent.Tools)),
 			}
@@ -111,10 +113,13 @@ func (s *service) Run(
 				tools = append(tools, s.toolManager.GetLocalTool(ctx, tool.LocalToolName))
 			}
 
-			var instBuilder strings.Builder
-			if err := chatInstTmpl.Execute(&instBuilder, instValues); err != nil {
+			var promptBuilder strings.Builder
+			if err := chatInstTmpl.Execute(&promptBuilder, instValues); err != nil {
 				return errors.Wrapf(err, "failed to execute template")
 			}
+			prompt := promptBuilder.String()
+
+			s.logger.Debug("call agent runtime's run", "prompt", prompt)
 
 			model := openai.Model(agent.ModelName)
 
@@ -123,7 +128,7 @@ func (s *service) Run(
 				model,
 				ai.WithCandidates(1),
 				ai.WithSystemPrompt(agent.System),
-				ai.WithTextPrompt(instBuilder.String()),
+				ai.WithTextPrompt(prompt),
 				ai.WithConfig(&ai.GenerationCommonConfig{
 					Temperature: 0.2,
 					TopP:        0.5,
