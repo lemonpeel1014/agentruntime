@@ -31,4 +31,5 @@ message Agent {
   string ModelName = 3;
   bool busy = 4;
   map<string, string> Metadata = 5;
+  string Role = 6;
 }

@@ -17,13 +17,9 @@ func (m *managerServer) GetAgent(ctx context.Context, req *GetAgentRequest) (*Ag
 		return nil, err
 	}
 
-	return &Agent{
-		Id:        uint32(agent.ID),
-		Name:      agent.Name,
-		ModelName: agent.ModelName,
-		Busy:      agent.Busy,
-		Metadata:  agent.Metadata.Data(),
-	}, nil
+	var res Agent
+	res.assignFromEntity(agent)
+	return &res, nil
 }
 
 func (m *managerServer) GetAgentByName(ctx context.Context, request *GetAgentByNameRequest) (*Agent, error) {
@@ -32,13 +28,9 @@ func (m *managerServer) GetAgentByName(ctx context.Context, request *GetAgentByN
 		return nil, err
 	}
 
-	return &Agent{
-		Id:        uint32(agent.ID),
-		Name:      agent.Name,
-		ModelName: agent.ModelName,
-		Busy:      agent.Busy,
-		Metadata:  agent.Metadata.Data(),
-	}, nil
+	var res Agent
+	res.assignFromEntity(agent)
+	return &res, nil
 }
 
 var (
