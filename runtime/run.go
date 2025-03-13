@@ -125,17 +125,29 @@ func (s *service) Run(
 
 			model := openai.Model(agent.ModelName)
 
+			var config any
+			switch agent.ModelName {
+			case "o1", "o3-mini":
+				config = openai.GenerationReasoningConfig{
+					ReasoningEffort: "high",
+				}
+			case "gpt-4o":
+				config = ai.GenerationCommonConfig{
+					Temperature: 0.2,
+					TopP:        0.5,
+					TopK:        16,
+				}
+			default:
+				return errors.Errorf("unsupported model %s", agent.ModelName)
+			}
+
 			resp, err := ai.Generate(
 				ctx,
 				model,
 				ai.WithCandidates(1),
 				ai.WithSystemPrompt(agent.System),
 				ai.WithTextPrompt(prompt),
-				ai.WithConfig(&ai.GenerationCommonConfig{
-					Temperature: 0.2,
-					TopP:        0.5,
-					TopK:        16,
-				}),
+				ai.WithConfig(config),
 				// TODO: Cannot support using tools with output format
 				ai.WithOutputFormat(ai.OutputFormatJSON),
 				ai.WithOutputSchema(&Conversation{}),

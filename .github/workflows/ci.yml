@@ -37,6 +37,20 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
+      # Start Docker services
+      - name: Start Docker services
+        run: docker compose up -d
+
+      # Create .env.test file from secret
+      - name: Create .env.test file
+        run: echo "${{ secrets.ENV_TEST_FILE }}" > .env.test
+        
       # Run tests using Makefile
       - name: Run tests using Makefile
         run: make test
+        id: tests
+        
+      # Stop Docker services (always runs)
+      - name: Stop Docker services
+        if: always()
+        run: docker compose down
