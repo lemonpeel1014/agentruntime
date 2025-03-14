@@ -58,7 +58,7 @@ func fromYAMLArray(str string) []interface{} {
 func toJSON(v interface{}) string {
 	var sb strings.Builder
 	enc := json.NewEncoder(&sb)
-	enc.SetIndent("  ", "  ")
+	enc.SetIndent("", "  ")
 
 	if err := enc.Encode(v); err != nil {
 		// Swallow errors inside of a template.

@@ -20,6 +20,7 @@ type Agent struct {
 	Bio             datatypes.JSONSlice[string]
 	Lore            datatypes.JSONSlice[string]
 	MessageExamples datatypes.JSONSlice[[]MessageExample]
+	Knowledge       datatypes.JSONSlice[map[string]any]
 
 	Tools []Tool `gorm:"many2many:agents_tools"`
 

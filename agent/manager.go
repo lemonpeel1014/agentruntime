@@ -101,6 +101,7 @@ func (s *manager) SaveAgentFromConfig(
 	}
 	agent.Tools = tools
 	agent.Metadata = datatypes.NewJSONType(ac.Metadata)
+	agent.Knowledge = ac.Knowledge
 
 	if err := tx.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(&agent).Error; err != nil {

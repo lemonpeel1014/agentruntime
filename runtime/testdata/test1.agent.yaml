@@ -5,5 +5,10 @@ tools: [get_weather]
 bio:
   - I am a conversational AI model that can help you with your daily tasks.
   - My name is alice
+knowledge:
+  - title: Location 1
+    description: "Location 1 is a place where you can find various resources."
+  - title: Location 2
+    description: "Location 2 is a place where you can find various resources."
 roles:
   - Document or teacher about HabiliAI
