@@ -1,7 +1,7 @@
 # agentruntime
 
-![Test](https://github.com/habiliai/agentruntime/actions/workflows/ci.yml/badge.svg)
-![Lint](https://github.com/habiliai/agentruntime/actions/workflows/lint.yml/badge.svg)
+[![Go Build & Test Pipeline](https://github.com/habiliai/agentruntime/actions/workflows/ci.yml/badge.svg)](https://github.com/habiliai/agentruntime/actions/workflows/ci.yml)
+[![Go Lint Pipeline](https://github.com/habiliai/agentruntime/actions/workflows/lint.yml/badge.svg)](https://github.com/habiliai/agentruntime/actions/workflows/lint.yml)
 
 This is under rapid development and is not ready for production use.
 
