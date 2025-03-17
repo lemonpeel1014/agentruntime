@@ -2,9 +2,8 @@ package thread
 
 import (
 	"context"
-	"github.com/habiliai/agentruntime/entity"
+	"encoding/json"
 	"github.com/habiliai/agentruntime/internal/di"
-	"github.com/mokiat/gog"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -31,18 +30,35 @@ func (m *managerServer) GetMessages(req *GetMessagesRequest, stream ThreadManage
 			break
 		}
 
-		resp := &GetMessagesResponse{
-			Messages: gog.Map(messages, func(msg entity.Message) *Message {
-				return &Message{
-					Id:        uint32(msg.ID),
-					Content:   msg.Content.Data().Text,
-					CreatedAt: timestamppb.New(msg.CreatedAt),
-					UpdatedAt: timestamppb.New(msg.UpdatedAt),
-					Sender:    msg.User,
+		var resp GetMessagesResponse
+		for _, msg := range messages {
+			content := msg.Content.Data()
+			res := Message{
+				Id:        uint32(msg.ID),
+				Content:   content.Text,
+				CreatedAt: timestamppb.New(msg.CreatedAt),
+				UpdatedAt: timestamppb.New(msg.UpdatedAt),
+				Sender:    msg.User,
+			}
+			for _, toolCall := range content.ToolCalls {
+				args, err := json.Marshal(toolCall.Arguments)
+				if err != nil {
+					return errors.Wrapf(err, "failed to marshal tool call arguments")
 				}
-			}),
+				result, err := json.Marshal(toolCall.Result)
+				if err != nil {
+					return errors.Wrapf(err, "failed to marshal tool call result")
+				}
+				res.ToolCalls = append(res.ToolCalls, &Message_ToolCall{
+					Name:      toolCall.Name,
+					Arguments: string(args),
+					Result:    string(result),
+				})
+			}
+			resp.Messages = append(resp.Messages, &res)
 		}
-		if err := stream.Send(resp); err != nil {
+
+		if err := stream.Send(&resp); err != nil {
 			return errors.Wrapf(err, "failed to send messages")
 		}
 		cursor = messages[len(messages)-1].ID
