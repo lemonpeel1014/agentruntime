@@ -26,5 +26,10 @@ func (s *AgentRuntimeTestSuite) TestRun() {
 	s.Require().NoError(err)
 	s.T().Logf(">> response: %v\n", messages[0].Content.Data().Text)
 
-	s.Require().Equal("done_agent", messages[0].Content.Data().ToolCall.Name)
+	s.Require().Len(messages[0].Content.Data().ToolCalls, 2)
+	toolCallNames := gog.Map(messages[0].Content.Data().ToolCalls, func(tc entity.MessageContentToolCall) string {
+		return tc.Name
+	})
+	s.Require().Contains(toolCallNames, "done_agent")
+	s.Require().Contains(toolCallNames, "get_weather")
 }

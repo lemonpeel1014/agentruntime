@@ -14,9 +14,9 @@ type AgentConfig struct {
 	Lore            []string `yaml:"lore"`
 	MessageExamples []struct {
 		Messages []struct {
-			Name   string `yaml:"name"`
-			Text   string `yaml:"text"`
-			Action string `yaml:"action"`
+			Name    string   `yaml:"name"`
+			Text    string   `yaml:"text"`
+			Actions []string `yaml:"actions"`
 		} `yaml:"messages"`
 	} `yaml:"messageExamples"`
 	Model     string            `yaml:"model"`

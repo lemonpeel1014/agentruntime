@@ -16,8 +16,8 @@ type Message struct {
 }
 
 type MessageContent struct {
-	Text     string                 `json:"text,omitempty"`
-	ToolCall MessageContentToolCall `json:"tool_call,omitempty"`
+	Text      string                   `json:"text,omitempty"`
+	ToolCalls []MessageContentToolCall `json:"tool_calls,omitempty"`
 }
 
 type MessageContentToolCall struct {

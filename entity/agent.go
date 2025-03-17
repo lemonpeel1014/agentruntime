@@ -6,9 +6,9 @@ import (
 )
 
 type MessageExample struct {
-	User   string `json:"user"`
-	Text   string `json:"text"`
-	Action string `json:"action"`
+	User    string   `json:"user"`
+	Text    string   `json:"text"`
+	Actions []string `json:"actions"`
 }
 
 type Agent struct {

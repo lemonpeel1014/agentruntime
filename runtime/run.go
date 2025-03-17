@@ -9,6 +9,7 @@ import (
 	"github.com/habiliai/agentruntime/internal/db"
 	"github.com/habiliai/agentruntime/internal/myctx"
 	"github.com/habiliai/agentruntime/tool"
+	"github.com/mokiat/gog"
 	"github.com/pkg/errors"
 	"github.com/yukinagae/genkit-go-plugins/plugins/openai"
 	"golang.org/x/sync/errgroup"
@@ -27,9 +28,9 @@ var (
 
 type (
 	Conversation struct {
-		User   string `json:"user"`
-		Text   string `json:"text"`
-		Action string `json:"action"`
+		User    string   `json:"user"`
+		Text    string   `json:"text"`
+		Actions []string `json:"actions"`
 	}
 
 	AvailableAction struct {
@@ -101,9 +102,11 @@ func (s *service) Run(
 			// build recent conversations
 			for _, msg := range messages {
 				instValues.RecentConversations = append(instValues.RecentConversations, Conversation{
-					User:   msg.User,
-					Text:   msg.Content.Data().Text,
-					Action: msg.Content.Data().ToolCall.Name,
+					User: msg.User,
+					Text: msg.Content.Data().Text,
+					Actions: gog.Map(msg.Content.Data().ToolCalls, func(tc entity.MessageContentToolCall) string {
+						return tc.Name
+					}),
 				})
 			}
 
@@ -177,17 +180,13 @@ func (s *service) Run(
 			}
 
 			toolCallData := tool.GetCallData(ctx)
-			if len(toolCallData) > 0 && conversation.Action != "" {
-				for _, data := range toolCallData {
-					if strings.EqualFold(data.Name, conversation.Action) {
-						content.ToolCall = entity.MessageContentToolCall{
-							Name:      conversation.Action,
-							Arguments: data.Arguments,
-							Result:    data.Result,
-						}
-						break
-					}
+			for _, data := range toolCallData {
+				tc := entity.MessageContentToolCall{
+					Name:      data.Name,
+					Arguments: data.Arguments,
+					Result:    data.Result,
 				}
+				content.ToolCalls = append(content.ToolCalls, tc)
 			}
 
 			newMessage := entity.Message{

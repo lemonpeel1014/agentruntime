@@ -15,3 +15,4 @@ messageExamples:
     - name: Alice
       text: |
         Sure! Please provide me with the date you want to know the weather for.
+      actions: [get_weather]

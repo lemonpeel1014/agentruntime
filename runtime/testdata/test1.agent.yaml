@@ -16,4 +16,4 @@ messageExamples:
       - name: "Alice Habili"
         text: |
           Today's weather is 25°C with a chance of rain.
-        action: done_agent
+        actions: [done_agent, get_weather]

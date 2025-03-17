@@ -15,6 +15,8 @@ func (s *ConfigTestSuite) TestLoadAgentsFromFiles() {
 	s.T().Logf("AgentConfig: %+v", agentConfig)
 
 	s.Require().Equal("Alice", agentConfig.Name)
+	s.Require().Len(agentConfig.MessageExamples[0].Messages, 2)
 	s.Require().Equal("USER", agentConfig.MessageExamples[0].Messages[0].Name)
-	s.Require().Equal("done_agent", agentConfig.MessageExamples[0].Messages[0].Action)
+	s.Require().Len(agentConfig.MessageExamples[0].Messages[1].Actions, 1)
+	s.Require().Equal("get_weather", agentConfig.MessageExamples[0].Messages[1].Actions[0])
 }
