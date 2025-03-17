@@ -1,6 +1,6 @@
 module github.com/habiliai/agentruntime
 
-go 1.23.6
+go 1.24
 
 replace github.com/firebase/genkit/go => github.com/habiliai/genkit/go v0.2.2-0.20250307210207-78939b29741a
 

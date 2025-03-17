@@ -7,6 +7,8 @@ import (
 	"github.com/firebase/genkit/go/ai"
 	"github.com/habiliai/agentruntime/entity"
 	"github.com/habiliai/agentruntime/internal/db"
+	"github.com/habiliai/agentruntime/internal/myctx"
+	"github.com/habiliai/agentruntime/tool"
 	"github.com/pkg/errors"
 	"github.com/yukinagae/genkit-go-plugins/plugins/openai"
 	"golang.org/x/sync/errgroup"
@@ -101,7 +103,7 @@ func (s *service) Run(
 				instValues.RecentConversations = append(instValues.RecentConversations, Conversation{
 					User:   msg.User,
 					Text:   msg.Content.Data().Text,
-					Action: msg.Content.Data().Action,
+					Action: msg.Content.Data().ToolCall.Name,
 				})
 			}
 
@@ -141,14 +143,20 @@ func (s *service) Run(
 				return errors.Errorf("unsupported model %s", agent.ModelName)
 			}
 
+			ctx = tool.WithEmptyCallDataStore(ctx)
 			resp, err := ai.Generate(
-				ctx,
+				myctx.WithThread(
+					myctx.WithAgent(
+						ctx,
+						&agent,
+					),
+					&thread,
+				),
 				model,
 				ai.WithCandidates(1),
 				ai.WithSystemPrompt(agent.System),
 				ai.WithTextPrompt(prompt),
 				ai.WithConfig(config),
-				// TODO: Cannot support using tools with output format
 				ai.WithOutputFormat(ai.OutputFormatJSON),
 				ai.WithOutputSchema(&Conversation{}),
 				ai.WithTools(tools...),
@@ -164,12 +172,28 @@ func (s *service) Run(
 				return errors.Wrapf(err, "failed to unmarshal conversation")
 			}
 
+			content := entity.MessageContent{
+				Text: conversation.Text,
+			}
+
+			toolCallData := tool.GetCallData(ctx)
+			if len(toolCallData) > 0 && conversation.Action != "" {
+				for _, data := range toolCallData {
+					if strings.ToLower(data.Name) == strings.ToLower(conversation.Action) {
+						content.ToolCall = entity.MessageContentToolCall{
+							Name:      conversation.Action,
+							Arguments: data.Arguments,
+							Result:    data.Result,
+						}
+						break
+					}
+				}
+			}
+
 			newMessage := entity.Message{
 				ThreadID: threadId,
 				User:     agent.Name,
-				Content: datatypes.NewJSONType(entity.MessageContent{
-					Text: conversation.Text,
-				}),
+				Content:  datatypes.NewJSONType(content),
 			}
 			if err := sess.Create(&newMessage).Error; err != nil {
 				return errors.Wrapf(err, "failed to create message")

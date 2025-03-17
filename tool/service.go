@@ -62,6 +62,16 @@ func RegisterLocalTool[In any, Out any](name string, description string, fn func
 	return ai.DefineTool(
 		name,
 		description,
-		fn,
+		func(ctx context.Context, input In) (Out, error) {
+			out, err := fn(ctx, input)
+			if err == nil {
+				appendCallData(ctx, CallData{
+					Name:      name,
+					Arguments: input,
+					Result:    out,
+				})
+			}
+			return out, err
+		},
 	)
 }

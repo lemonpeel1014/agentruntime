@@ -89,8 +89,9 @@ func (s *manager) SaveAgentFromConfig(
 		var messages []entity.MessageExample
 		for _, msg := range ex.Messages {
 			messages = append(messages, entity.MessageExample{
-				User: msg.Name,
-				Text: msg.Text,
+				User:   msg.Name,
+				Text:   msg.Text,
+				Action: msg.Action,
 			})
 		}
 		agent.MessageExamples = append(agent.MessageExamples, messages)

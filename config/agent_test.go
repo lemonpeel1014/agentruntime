@@ -16,5 +16,5 @@ func (s *ConfigTestSuite) TestLoadAgentsFromFiles() {
 
 	s.Require().Equal("Alice", agentConfig.Name)
 	s.Require().Equal("USER", agentConfig.MessageExamples[0].Messages[0].Name)
-	s.Require().Equal("Alice", agentConfig.MessageExamples[0].Messages[1].Name)
+	s.Require().Equal("done_agent", agentConfig.MessageExamples[0].Messages[0].Action)
 }

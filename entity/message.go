@@ -16,8 +16,12 @@ type Message struct {
 }
 
 type MessageContent struct {
-	Text            string `json:"text,omitempty"`
-	Action          string `json:"action,omitempty"`
-	ActionParameter string `json:"action_parameter,omitempty"`
-	ActionResult    string `json:"action_result,omitempty"`
+	Text     string                 `json:"text,omitempty"`
+	ToolCall MessageContentToolCall `json:"tool_call,omitempty"`
+}
+
+type MessageContentToolCall struct {
+	Name      string `json:"name,omitempty"`
+	Arguments any    `json:"arguments,omitempty"`
+	Result    any    `json:"result,omitempty"`
 }
