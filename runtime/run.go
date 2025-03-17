@@ -179,7 +179,7 @@ func (s *service) Run(
 			toolCallData := tool.GetCallData(ctx)
 			if len(toolCallData) > 0 && conversation.Action != "" {
 				for _, data := range toolCallData {
-					if strings.ToLower(data.Name) == strings.ToLower(conversation.Action) {
+					if strings.EqualFold(data.Name, conversation.Action) {
 						content.ToolCall = entity.MessageContentToolCall{
 							Name:      conversation.Action,
 							Arguments: data.Arguments,

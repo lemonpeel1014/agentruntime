@@ -56,7 +56,7 @@ PB_FILES := runtime/runtime.pb.go runtime/runtime_grpc.pb.go thread/thread.pb.go
 pb: $(PB_FILES)
 
 $(GOLANG_CI_LINT):
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.62.2
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.64.7
 	@chmod +x $(GOLANG_CI_LINT)
 	@echo "golangci-lint installed"
 
