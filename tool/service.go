@@ -9,6 +9,7 @@ import (
 	"github.com/habiliai/agentruntime/internal/mylog"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type (
@@ -23,12 +24,17 @@ func (s *service) InitializeTools(ctx context.Context) error {
 	_, tx := db.OpenSession(ctx, s.db)
 	return tx.Transaction(func(tx *gorm.DB) error {
 		for _, toolName := range localToolNames {
-			tool := ai.LookupTool(toolName).Definition()
-			if err := tx.Save(&entity.Tool{
-				Name:          toolName,
-				Description:   tool.Description,
-				LocalToolName: tool.Name,
-			}).Error; err != nil {
+			var tool entity.Tool
+			if err := tx.Clauses(clause.Locking{
+				Strength: "UPDATE",
+			}).Find(&tool, "name = ?", toolName).Error; err != nil {
+				return errors.Wrapf(err, "failed to find tool")
+			}
+			toolDef := ai.LookupTool(toolName).Definition()
+			tool.Name = toolName
+			tool.Description = toolDef.Description
+			tool.LocalToolName = tool.Name
+			if err := tx.Save(&tool).Error; err != nil {
 				return errors.Wrapf(err, "failed to save tool")
 			}
 		}
