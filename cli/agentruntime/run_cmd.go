@@ -11,11 +11,11 @@ import (
 
 func newRunCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "run <thread_id> <agent_name>",
+		Use:   "run <thread_id> <agent_name> [...<agent_name>]",
 		Short: "Run agent runtime",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-			if len(args) != 2 {
+			if len(args) < 2 {
 				return errors.Errorf("thread_id and agent_name are required")
 			}
 
@@ -24,7 +24,7 @@ func newRunCmd() *cobra.Command {
 				return errors.Wrapf(err, "thread_id must be a number")
 			}
 
-			agentName := args[1]
+			agentNames := args[1:]
 
 			runtime, err := di.Get[runtime.Runtime](ctx, runtime.Key)
 			if err != nil {
@@ -36,12 +36,16 @@ func newRunCmd() *cobra.Command {
 				return err
 			}
 
-			ag, err := agentManager.FindAgentByName(ctx, agentName)
-			if err != nil {
-				return err
+			agentIds := make([]uint, 0, len(agentNames))
+			for _, name := range agentNames {
+				ag, err := agentManager.FindAgentByName(ctx, name)
+				if err != nil {
+					return err
+				}
+				agentIds = append(agentIds, ag.ID)
 			}
 
-			if err := runtime.Run(ctx, uint(threadId), []uint{ag.ID}); err != nil {
+			if err := runtime.Run(ctx, uint(threadId), agentIds); err != nil {
 				return err
 			}
 

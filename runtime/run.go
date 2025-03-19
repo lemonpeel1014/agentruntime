@@ -54,9 +54,6 @@ func (s *service) Run(
 	threadId uint,
 	agentIds []uint,
 ) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	ctx, sess := db.OpenSession(ctx, s.db)
 
 	var thread entity.Thread
@@ -90,6 +87,9 @@ func (s *service) Run(
 	var eg errgroup.Group
 	for _, agent := range agents {
 		eg.Go(func() error {
+			ctx, cancel := context.WithCancel(ctx)
+			defer cancel()
+
 			// construct inst values
 			instValues := ChatInstValues{
 				Agent:               agent,
