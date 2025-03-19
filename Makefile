@@ -102,4 +102,3 @@ release: $(AGENTRUNTIME_BIN_FILES)
 	git push origin v$(NEXT_VERSION)
 	convco changelog > CHANGELOG.md
 	gh release create v$(NEXT_VERSION) $(AGENTRUNTIME_BIN_FILES) --title "v$(NEXT_VERSION)" --notes-file CHANGELOG.md
-	gh release upload v$(NEXT_VERSION)
