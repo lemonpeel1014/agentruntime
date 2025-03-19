@@ -7,6 +7,7 @@ PROTOC := bin/protoc
 GOLANG_CI_LINT := bin/golangci-lint
 
 AGENTRUNTIME_BIN := bin/agentruntime
+AGENTRUNTIME_BIN_FILES := bin/agentruntime-linux-amd64 bin/agentruntime-linux-arm64 bin/agentruntime-darwin-amd64 bin/agentruntime-darwin-arm64 bin/agentruntime-windows-amd64.exe
 
 .PHONY: all
 all: build
@@ -77,9 +78,28 @@ clean:
 	rm -f $(GOLANG_CI_LINT)
 	@echo "cleared"
 
-.PHONY: $(AGENTRUNTIME_BIN)
-$(AGENTRUNTIME_BIN): pb
-	CGO_ENABLED=0 go build -o bin/agentruntime ./cmd/agentruntime
+.PHONY: bin/agentruntime-windows-%.exe
+bin/agentruntime-windows-%.exe: pb
+	GOOS=windows GOARCH=$* CGO_ENABLED=0 go build -o $@ ./cmd/agentruntime
 
+.PHONY: bin/agentruntime-%
+bin/agentruntime-%: pb
+	$(eval OS_NAME := $(word 1,$(subst -, ,$*)))
+	$(eval ARCH_NAME := $(word 2,$(subst -, ,$*)))
+	GOOS=$(OS_NAME) GOARCH=$(ARCH_NAME) CGO_ENABLED=0 go build -o $@ ./cmd/agentruntime
+
+$(AGENTRUNTIME_BIN): bin/agentruntime-$(GOOS)-$(GOARCH)
+	cp bin/agentruntime-$(GOOS)-$(GOARCH) $(AGENTRUNTIME_BIN)
+
+.PHONY: install
 install:
 	CGO_ENABLED=0 go install ./cmd/agentruntime
+
+.PHONY: release
+release: $(AGENTRUNTIME_BIN_FILES)
+	$(eval NEXT_VERSION := $(shell convco version --bump))
+	git tag -a v$(NEXT_VERSION) -m "chore(release): v$(NEXT_VERSION)"
+	git push origin v$(NEXT_VERSION)
+	convco changelog > CHANGELOG.md
+	gh release create v$(NEXT_VERSION) $(AGENTRUNTIME_BIN_FILES) --title "v$(NEXT_VERSION)" --notes-file CHANGELOG.md
+	gh release upload v$(NEXT_VERSION)
