@@ -19,6 +19,11 @@ type RuntimeConfig struct {
 	DatabaseAutoMigrate  bool   `env:"DATABASE_AUTO_MIGRATE"`
 	LocalToolAutoMigrate bool   `env:"LOCAL_TOOL_AUTO_MIGRATE"`
 	OpenWeatherApiKey    string `env:"OPENWEATHER_API_KEY"`
+	XConsumerKey         string `env:"X_CONSUMER_KEY"`
+	XConsumerSecret      string `env:"X_CONSUMER_SECRET"`
+	XAccessToken         string `env:"X_ACCESS_TOKEN"`
+	XAccessTokenSecret   string `env:"X_ACCESS_TOKEN_SECRET"`
+	XAccountId           string `env:"X_ACCOUNT_ID"`
 }
 
 var (

@@ -18,6 +18,7 @@ type (
 		GetTools(ctx context.Context, names []string) ([]entity.Tool, error)
 
 		GetWeather(ctx context.Context, req *GetWeatherRequest) (*GetWeatherResponse, error)
+		PostToX(ctx context.Context, req *PostToXRequest) (*PostToXResponse, error)
 	}
 )
 
